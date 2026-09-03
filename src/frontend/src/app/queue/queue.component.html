@@ -1,0 +1,9 @@
+
+
+@if (!loading$() && !error$()) {
+  <p>Content loaded successfully.</p>
+} @else if (loading$()) {
+  <p>Loading...</p>
+} @else {
+  <p style="color:crimson">Something went wrong.</p>
+}
