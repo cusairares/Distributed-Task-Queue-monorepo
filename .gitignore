@@ -1,0 +1,56 @@
+# ==========================================
+# Root .gitignore for Distributed Task Queue Monorepo
+# ==========================================
+
+# ------------------------------------------
+# Node / Angular / Frontend
+# ------------------------------------------
+node_modules/
+dist/
+tmp/
+out-tsc/
+.angular/
+.npm
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+
+# ------------------------------------------
+# .NET / C# / Backend
+# ------------------------------------------
+**/[Bb]in/
+**/[Oo]bj/
+**/[Dd]ebug/
+**/[Rr]elease/
+*.user
+*.userprefs
+*.suo
+*.sln.docstates
+.vs/
+TestResults/
+*.resharper*
+
+# ------------------------------------------
+# Environment & Secret files
+# ------------------------------------------
+.env
+.env.local
+.env.*.local
+appsettings.Development.local.json
+appsettings.Local.json
+
+# ------------------------------------------
+# OS / Editor files
+# ------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
