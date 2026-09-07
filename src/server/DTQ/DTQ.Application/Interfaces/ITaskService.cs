@@ -6,6 +6,7 @@ namespace DTQ.Application.Interfaces
 {
     public interface ITaskService
     {
-        public Task<IReadOnlyList<ITask>> GetTasksAsync(TaskStatus? status);
+        Task<bool> CreateTaskAsync(CreateTaskRequest taskRequest);
+        Task<IReadOnlyList<TaskResponseDto>> GetTasksAsync(TaskItemStatus? status);
     }
 }

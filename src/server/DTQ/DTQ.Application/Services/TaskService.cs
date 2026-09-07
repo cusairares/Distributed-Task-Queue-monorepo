@@ -7,13 +7,36 @@ namespace DTQ.Application.Services
 {
     public class TaskService : ITaskService
     {
-        private IRegistry _registry;
+        private readonly IRepository _repository;
+        private readonly Queue<Guid> _taskQueue = new();
 
-        public TaskService(IRegistry registry) 
+        public TaskService(IRepository repository) 
         {
-            this._registry = registry;
+            _repository = repository;
         }
-        public async Task<IReadOnlyList<ITask>> GetTasksAsync(TaskStatus? status)
+
+        public async Task<IReadOnlyList<TaskResponseDto>> GetTasksAsync(TaskItemStatus? status)
+        {
+            var tasks = status is null
+                ? await _repository.GetAllTasksAsync()
+                : await _repository.GetTasksByStatusAsync(status.Value);
+
+            return tasks.Select(TaskResponseDto.FromDomain).ToList();
+        }
+
+        public async Task<bool> CreateTaskAsync(CreateTaskRequest taskRequest)
+        {
+            var task = TaskItem.Create(taskRequest.name, taskRequest.taskType, taskRequest.payload, taskRequest.maxRetries);
+
+            var completed = await _repository.AddTaskAsync(task);
+
+            if (completed)
+        {
+                _taskQueue.Enqueue(task.Id);
+        }
+
+            return completed;
+        }
         {
             if(status is null)
             {
