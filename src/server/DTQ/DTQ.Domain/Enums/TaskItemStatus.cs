@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTQ.Domain.Enums
 {
-    public enum TaskStatus
+    public enum TaskItemStatus
     {
         Pending = 0,
         Processing = 1,
