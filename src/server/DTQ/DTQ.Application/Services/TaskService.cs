@@ -1,7 +1,9 @@
-﻿using DTQ.Application.Interfaces;
+using DTQ.Application.Interfaces;
+using DTQ.Application.Requests;
+using DTQ.Application.Responses;
+using DTQ.Domain;
+using DTQ.Domain.Enums;
 using DTQ.Domain.Interfaces;
-
-using TaskStatus = DTQ.Domain.Enums.TaskStatus;
 
 namespace DTQ.Application.Services
 {
@@ -31,18 +33,24 @@ namespace DTQ.Application.Services
             var completed = await _repository.AddTaskAsync(task);
 
             if (completed)
-        {
+            {
                 _taskQueue.Enqueue(task.Id);
-        }
+            }
 
             return completed;
         }
+
+        public async Task<TaskResponseDto?> ClaimTaskAsync(Guid workerId)
         {
-            if(status is null)
+
+            var task = await _repository.ClaimNextTaskAsync(workerId);
+
+            if(task == null)
             {
-                return await _registry.GetAllTasksAsync();
+                return null;
             }
-            return await _registry.GetTasksByStatusAsync(status.Value);
+            
+            return TaskResponseDto.FromDomain(task);
         }
     }
 }

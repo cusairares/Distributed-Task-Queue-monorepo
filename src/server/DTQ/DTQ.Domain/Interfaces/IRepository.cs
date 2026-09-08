@@ -11,5 +11,9 @@ namespace DTQ.Domain.Interfaces
         Task<bool> AddTaskAsync(TaskItem task);
 
         Task<TaskItem?> GetByIdAsync(Guid taskId);
+
+        Task<TaskItem?> ClaimNextTaskAsync(Guid workerId);
+
+        bool UpdateByIdAsync(TaskItem item);
     }
 }

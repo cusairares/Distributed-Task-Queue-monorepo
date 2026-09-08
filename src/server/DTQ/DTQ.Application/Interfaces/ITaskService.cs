@@ -1,6 +1,6 @@
-﻿using DTQ.Domain.Interfaces;
-using TaskStatus = DTQ.Domain.Enums.TaskStatus;
-
+using DTQ.Application.Requests;
+using DTQ.Application.Responses;
+using DTQ.Domain.Enums;
 
 namespace DTQ.Application.Interfaces
 {
@@ -8,5 +8,6 @@ namespace DTQ.Application.Interfaces
     {
         Task<bool> CreateTaskAsync(CreateTaskRequest taskRequest);
         Task<IReadOnlyList<TaskResponseDto>> GetTasksAsync(TaskItemStatus? status);
+        Task<TaskResponseDto?> ClaimTaskAsync(Guid workerId);
     }
 }

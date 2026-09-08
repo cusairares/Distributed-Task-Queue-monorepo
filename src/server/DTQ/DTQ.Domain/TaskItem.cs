@@ -20,8 +20,10 @@ namespace DTQ.Domain
         private DateTimeOffset? _leaseExpiresAt;
         private DateTimeOffset _creationDate;
 
+        private Guid? _workerId;
         public Guid Id => _id;
 
+        private Guid? WorkderId => _workerId;
         public string Name => _name;
 
         public string TaskType => _taskType;
@@ -54,6 +56,7 @@ namespace DTQ.Domain
             _fencingToken = null;
             _leaseExpiresAt = null;
             _creationDate = creationDate;
+            _workerId = null;
         }
 
         public static TaskItem Create(string name, string taskType, string payload, int maxRetries)
@@ -66,20 +69,6 @@ namespace DTQ.Domain
                 maxRetries,
                 DateTimeOffset.UtcNow
             );
-        }
-
-        public bool TryClaim(string workerId)
-        {
-            if(Status != TaskItemStatus.Pending) return false;
-
-            if (Status == TaskItemStatus.Processing && RetriesCount >= MaxRetries) return false;
-
-            _fencingToken = 0;
-            _leaseExpiresAt = DateTimeOffset.UtcNow.AddMilliseconds(1000);
-            _retriesCount++;
-            _status = TaskItemStatus.Processing;
-
-            return true;
         }
     }
 }
