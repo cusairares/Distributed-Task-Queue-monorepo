@@ -11,7 +11,8 @@ namespace DTQ.Application.Responses
         TaskItemStatus Status,
         int MaxRetries,
         int RetriesCount,
-        DateTimeOffset CreationDate)
+        DateTimeOffset CreationDate,
+        int FencingToken)
     {
         public static TaskResponseDto FromDomain(TaskItem task)
         {
@@ -23,7 +24,8 @@ namespace DTQ.Application.Responses
                 task.Status,
                 task.MaxRetries,
                 task.RetriesCount,
-                task.CreationDate
+                task.CreationDate,
+                task.FencingToken ?? 0
             );
         }
     }

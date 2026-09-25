@@ -52,13 +52,37 @@ namespace DTQ.Application.Services
             return Result<TaskResponseDto>.Success(TaskResponseDto.FromDomain(task));
         }
 
-        public async Task<Result> MarkAsSuccessAsync(Guid id)
+        public async Task<Result> MarkAsSuccessAsync(Guid taskId, UpdateTaskRequest request)
         {
-            var completed = await _repository.MarkAsSuccessAsync(id);
+            var completed = await _repository.MarkAsSuccessAsync(taskId, request.WorkerId, request.FencingToken);
 
             if (!completed)
             {
-                return Result.Failure($"Task with id '{id}' could not be marked as success.");
+                return Result.Failure($"Task with id '{taskId}' could not be marked as success.");
+            }
+
+            return Result.Success();
+        }
+
+        public async Task<Result> MarkAsFailedAsync(Guid taskId, UpdateTaskRequest request)
+        {
+            var completed = await _repository.MarkAsFailedAsync(taskId, request.WorkerId, request.FencingToken);
+
+            if (!completed)
+            {
+                return Result.Failure($"Task with id '{taskId}' could not be marked as failed.");
+            }
+
+            return Result.Success();
+        }
+
+        public async Task<Result> HeartbeatAsync(Guid taskId, UpdateTaskRequest request)
+        {
+            var completed = await _repository.HeartbeatAsync(taskId, request.WorkerId, request.FencingToken);
+
+            if (!completed)
+            {
+                return Result.Failure($"Task with id '{taskId}' heartbeat failed. Worker may no longer own this task.");
             }
 
             return Result.Success();

@@ -16,6 +16,10 @@ namespace DTQ.Domain.Interfaces
 
         Task<bool> UpdateByIdAsync(TaskItem item);
 
-        Task<bool> MarkAsSuccessAsync(Guid id);
+        Task<bool> MarkAsSuccessAsync(Guid taskId, Guid workerId, int fencingToken);
+
+        Task<bool> MarkAsFailedAsync(Guid taskId, Guid workerId, int fencingToken);
+
+        Task<bool> HeartbeatAsync(Guid taskId, Guid workerId, int fencingToken);
     }
 }

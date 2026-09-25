@@ -48,12 +48,31 @@ namespace DTQ.Infrastructure.Repositories
         public Task<TaskItem?> ClaimNextTaskAsync(Guid workerId)
         {
             // Needs DB query mock / atomic fetch & update
+            // update should fencingToken += 1
             return Task.FromResult<TaskItem?>(null);
         }
 
-        public Task<bool> MarkAsSuccessAsync(Guid id)
+        public Task<bool> MarkAsSuccessAsync(Guid taskId, Guid workerId, int fencingToken)
         {
-            // Mock WIP - fetch and update with lock of task
+            // TODO: Atomic DB query — validate fencingToken + workerId, set Status = Completed, clear lease
+            // UPDATE tasks SET status = 'Completed', lease_expires_at = NULL
+            // WHERE id = @taskId AND worker_id = @workerId AND fencing_token = @fencingToken
+            return Task.FromResult(false);
+        }
+
+        public Task<bool> MarkAsFailedAsync(Guid taskId, Guid workerId, int fencingToken)
+        {
+            // TODO: Atomic DB query — validate fencingToken + workerId, set Status = Failed (or increment retry), clear lease
+            // UPDATE tasks SET status = 'Failed', lease_expires_at = NULL
+            // WHERE id = @taskId AND worker_id = @workerId AND fencing_token = @fencingToken
+            return Task.FromResult(false);
+        }
+
+        public Task<bool> HeartbeatAsync(Guid taskId, Guid workerId, int fencingToken)
+        {
+            // TODO: Atomic DB query — validate fencingToken + workerId, extend lease
+            // UPDATE tasks SET lease_expires_at = NOW() + INTERVAL '30s'
+            // WHERE id = @taskId AND worker_id = @workerId AND fencing_token = @fencingToken
             return Task.FromResult(false);
         }
     }
