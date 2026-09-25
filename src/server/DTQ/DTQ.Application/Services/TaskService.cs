@@ -28,7 +28,7 @@ namespace DTQ.Application.Services
 
         public async Task<bool> CreateTaskAsync(CreateTaskRequest taskRequest)
         {
-            var task = TaskItem.Create(taskRequest.name, taskRequest.taskType, taskRequest.payload, taskRequest.maxRetries);
+            var task = TaskItem.Create(taskRequest.Name, taskRequest.TaskType, taskRequest.Payload, taskRequest.MaxRetries);
 
             var completed = await _repository.AddTaskAsync(task);
 

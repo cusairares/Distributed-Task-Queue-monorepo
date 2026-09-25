@@ -11,13 +11,22 @@ namespace DTQ.ApiGateway.Endpoints
         {
             var group = builder.MapGroup("dtq/api/v1").WithTags("Worker Endpoints");
 
-            group.MapGet("/claim", async ([FromBody] ClaimTaskRequest request, ITaskService service) => 
+            group.MapPost("/claim", async ([FromBody] ClaimTaskRequest request, ITaskService service) => 
             {
-                var task = await service.ClaimTaskAsync(request.workerId);
+                var result = await service.ClaimTaskAsync(request.WorkerId);
 
-                return task is not null ? Results.Ok(task) : Results.NoContent();
+                return result.IsSuccess ? Results.Ok(result.Value) : Results.NoContent();
 
-            }).WithSummary("Get a pending task from queue");
+            }).WithSummary("Claim a pending task from queue");
+
+            group.MapPost("/tasks/{taskId:guid}/complete", async (Guid taskId, ITaskService service) =>
+            {
+                var result = await service.MarkAsSuccessAsync(taskId);
+
+                return result.IsSuccess 
+                    ? Results.Ok() 
+                    : Results.Problem(detail: result.Error, statusCode: StatusCodes.Status400BadRequest);
+            }).WithSummary("Mark a task as completed");
 
             return group;
         }

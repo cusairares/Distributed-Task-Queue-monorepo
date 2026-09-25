@@ -21,28 +21,28 @@ namespace DTQ.ApiGateway.Endpoints
 
             group.MapPost("/tasks", async (CreateTaskRequest request, ITaskService service) =>
             {
-                if (string.IsNullOrWhiteSpace(request.name))
+                if (string.IsNullOrWhiteSpace(request.Name))
                 {
-                    return Results.BadRequest(new { error = "Task name is required." });
+                    return Results.Problem(detail: "Task name is required.", statusCode: StatusCodes.Status400BadRequest, title: "Validation Error");
                 }
 
-                if (string.IsNullOrWhiteSpace(request.taskType))
+                if (string.IsNullOrWhiteSpace(request.TaskType))
                 {
-                    return Results.BadRequest(new { error = "Task type is required." });
+                    return Results.Problem(detail: "Task type is required.", statusCode: StatusCodes.Status400BadRequest, title: "Validation Error");
                 }
 
-                if (request.maxRetries < 0)
+                if (request.MaxRetries < 0)
                 {
-                    return Results.BadRequest(new { error = "MaxRetries cannot be negative." });
+                    return Results.Problem(detail: "MaxRetries cannot be negative.", statusCode: StatusCodes.Status400BadRequest, title: "Validation Error");
                 }
 
-                var completed = await service.CreateTaskAsync(request);
-                if (!completed)
+                var result = await service.CreateTaskAsync(request);
+                if (result.IsFailure)
                 {
-                    return Results.StatusCode(StatusCodes.Status500InternalServerError);
+                    return Results.Problem(detail: result.Error, statusCode: StatusCodes.Status500InternalServerError);
                 }
 
-                return Results.Ok();
+                return Results.Created($"/dtq/api/v1/tasks/{result.Value.Id}", result.Value);
             }).WithSummary("Create task");
             
             return group;

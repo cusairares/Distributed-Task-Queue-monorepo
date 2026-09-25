@@ -1,5 +1,4 @@
 using DTQ.Domain.Enums;
-using System.Security.Claims;
 
 namespace DTQ.Domain
 {
@@ -23,7 +22,7 @@ namespace DTQ.Domain
         private Guid? _workerId;
         public Guid Id => _id;
 
-        private Guid? WorkderId => _workerId;
+        public Guid? WorkerId => _workerId;
         public string Name => _name;
 
         public string TaskType => _taskType;
