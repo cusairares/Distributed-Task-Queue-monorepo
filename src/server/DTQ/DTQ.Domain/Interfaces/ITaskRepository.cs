@@ -2,7 +2,7 @@ using DTQ.Domain.Enums;
 
 namespace DTQ.Domain.Interfaces
 {
-    public interface IRepository
+    public interface ITaskRepository
     {
         Task<IReadOnlyList<TaskItem>> GetAllTasksAsync();
 
@@ -14,6 +14,8 @@ namespace DTQ.Domain.Interfaces
 
         Task<TaskItem?> ClaimNextTaskAsync(Guid workerId);
 
-        bool UpdateByIdAsync(TaskItem item);
+        Task<bool> UpdateByIdAsync(TaskItem item);
+
+        Task<bool> MarkAsSuccessAsync(Guid id);
     }
 }

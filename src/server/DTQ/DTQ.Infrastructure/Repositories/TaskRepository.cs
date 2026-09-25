@@ -2,14 +2,13 @@ using DTQ.Domain;
 using DTQ.Domain.Enums;
 using DTQ.Domain.Interfaces;
 using System.Collections.Concurrent;
-using System.Net.NetworkInformation;
 
 namespace DTQ.Infrastructure.Repositories
 {
-    public class TaskRepository : IRepository
+    public class TaskRepository : ITaskRepository
     {
 
-        //mock will be replaced with PostgreSQL
+        // Mock will be replaced with PostgreSQL
         private static readonly ConcurrentDictionary<Guid, TaskItem> _tasks = new();
 
         public Task<bool> AddTaskAsync(TaskItem task)
@@ -36,26 +35,26 @@ namespace DTQ.Infrastructure.Repositories
             return Task.FromResult(task);
         }
 
-        public bool UpdateByIdAsync(TaskItem item)
+        public Task<bool> UpdateByIdAsync(TaskItem item)
         {
-            return _tasks.TryUpdate(item.Id,item, _tasks[item.Id]);
+            if (!_tasks.TryGetValue(item.Id, out var existing))
+            {
+                return Task.FromResult(false);
+            }
+
+            return Task.FromResult(_tasks.TryUpdate(item.Id, item, existing));
         }
 
-        public Task<TaskItem> ClaimNextTaskAsync(Guid workerId)
+        public Task<TaskItem?> ClaimNextTaskAsync(Guid workerId)
         {
-            //needs DB query mock
-            //using LOCK + fetching and also updating the task 
-            //if (Status != TaskItemStatus.Pending) return false;
+            // Needs DB query mock / atomic fetch & update
+            return Task.FromResult<TaskItem?>(null);
+        }
 
-            //if (Status == TaskItemStatus.Processing && RetriesCount >= MaxRetries) return false;
-
-            //_fencingToken = 0;
-            //_leaseExpiresAt = DateTimeOffset.UtcNow.AddMilliseconds(1000);
-            //_retriesCount++;
-            //_status = TaskItemStatus.Processing;
-            //_workerId = workerId;
-
-            return null;
+        public Task<bool> MarkAsSuccessAsync(Guid id)
+        {
+            // Mock WIP - fetch and update with lock of task
+            return Task.FromResult(false);
         }
     }
 }
