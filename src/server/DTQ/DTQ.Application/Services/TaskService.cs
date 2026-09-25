@@ -1,3 +1,4 @@
+using DTQ.Application.Common;
 using DTQ.Application.Interfaces;
 using DTQ.Application.Requests;
 using DTQ.Application.Responses;
@@ -9,10 +10,9 @@ namespace DTQ.Application.Services
 {
     public class TaskService : ITaskService
     {
-        private readonly IRepository _repository;
-        private readonly Queue<Guid> _taskQueue = new();
+        private readonly ITaskRepository _repository;
 
-        public TaskService(IRepository repository) 
+        public TaskService(ITaskRepository repository) 
         {
             _repository = repository;
         }
@@ -26,31 +26,42 @@ namespace DTQ.Application.Services
             return tasks.Select(TaskResponseDto.FromDomain).ToList();
         }
 
-        public async Task<bool> CreateTaskAsync(CreateTaskRequest taskRequest)
+        public async Task<Result<TaskResponseDto>> CreateTaskAsync(CreateTaskRequest taskRequest)
         {
             var task = TaskItem.Create(taskRequest.Name, taskRequest.TaskType, taskRequest.Payload, taskRequest.MaxRetries);
 
             var completed = await _repository.AddTaskAsync(task);
 
-            if (completed)
+            if (!completed)
             {
-                _taskQueue.Enqueue(task.Id);
+                return Result<TaskResponseDto>.Failure("Failed to add task to repository.");
             }
 
-            return completed;
+            return Result<TaskResponseDto>.Success(TaskResponseDto.FromDomain(task));
         }
 
-        public async Task<TaskResponseDto?> ClaimTaskAsync(Guid workerId)
+        public async Task<Result<TaskResponseDto>> ClaimTaskAsync(Guid workerId)
         {
-
             var task = await _repository.ClaimNextTaskAsync(workerId);
 
-            if(task == null)
+            if (task == null)
             {
-                return null;
+                return Result<TaskResponseDto>.Failure("No pending tasks available to claim.");
             }
             
-            return TaskResponseDto.FromDomain(task);
+            return Result<TaskResponseDto>.Success(TaskResponseDto.FromDomain(task));
+        }
+
+        public async Task<Result> MarkAsSuccessAsync(Guid id)
+        {
+            var completed = await _repository.MarkAsSuccessAsync(id);
+
+            if (!completed)
+            {
+                return Result.Failure($"Task with id '{id}' could not be marked as success.");
+            }
+
+            return Result.Success();
         }
     }
 }
