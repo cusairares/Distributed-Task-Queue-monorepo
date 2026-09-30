@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { QueueFacade } from '../../state/queue-facade';
 
 @Component({
   selector: 'app-sidebar',
@@ -6,4 +7,6 @@ import { Component } from '@angular/core';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css',
 })
-export class SidebarComponent {}
+export class SidebarComponent {
+  queueFacade = inject(QueueFacade);
+}
