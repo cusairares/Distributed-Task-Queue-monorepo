@@ -11,16 +11,16 @@ namespace DTQ.ApiGateway.Endpoints
         {
             var group = builder.MapGroup("dtq/api/v1").WithTags("Worker Endpoints");
 
-            group.MapPost("/claim", async ([FromBody] ClaimTaskRequest request, ITaskService service) => 
+            group.MapPost("/claim", async (ITaskService service) => 
             {
-                var result = await service.ClaimTaskAsync(request.WorkerId);
+                var result = await service.ClaimTaskAsync();
 
                 return result.IsSuccess ? Results.Ok(result.Value) : Results.NoContent();
 
-            }).WithSummary("Claim a pending task from queue").WithDescription("Using a worker ID we query " +
+            }).WithSummary("Claim a pending task from queue").WithDescription("We query " +
             "and update (Status and Fencing Token the db in one atomic action");
 
-            group.MapPost("/tasks/{taskId:guid}/complete", async (Guid taskId, [FromBody] UpdateTaskRequest request, ITaskService service) =>
+            group.MapPost("/tasks/{taskId:int}/complete", async (int taskId, [FromBody] UpdateTaskRequest request, ITaskService service) =>
             {
                 var result = await service.MarkAsSuccessAsync(taskId, request);
 
@@ -29,7 +29,7 @@ namespace DTQ.ApiGateway.Endpoints
                     : Results.Problem(detail: result.Error, statusCode: StatusCodes.Status400BadRequest);
             }).WithSummary("Mark a task as completed");
 
-            group.MapPost("/tasks/{taskId:guid}/fail", async (Guid taskId, [FromBody] UpdateTaskRequest request, ITaskService service) =>
+            group.MapPost("/tasks/{taskId:int}/fail", async (int taskId, [FromBody] UpdateTaskRequest request, ITaskService service) =>
             {
                 var result = await service.MarkAsFailedAsync(taskId, request);
 
@@ -38,7 +38,7 @@ namespace DTQ.ApiGateway.Endpoints
                     : Results.Problem(detail: result.Error, statusCode: StatusCodes.Status400BadRequest);
             }).WithSummary("Mark a task as failed");
 
-            group.MapPost("/tasks/{taskId:guid}/heartbeat", async (Guid taskId, [FromBody] UpdateTaskRequest request, ITaskService service) =>
+            group.MapPost("/tasks/{taskId:int}/heartbeat", async (int taskId, [FromBody] UpdateTaskRequest request, ITaskService service) =>
             {
                 var result = await service.HeartbeatAsync(taskId, request);
 

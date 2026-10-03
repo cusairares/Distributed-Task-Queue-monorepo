@@ -1,4 +1,4 @@
 namespace DTQ.Application.Requests
 {
-    public record UpdateTaskRequest(Guid WorkerId, int FencingToken);
+    public record UpdateTaskRequest(int FencingToken, string? ErrorMessage = null);
 }

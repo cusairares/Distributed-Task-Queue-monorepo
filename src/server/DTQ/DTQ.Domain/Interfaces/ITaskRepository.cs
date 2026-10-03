@@ -10,16 +10,16 @@ namespace DTQ.Domain.Interfaces
 
         Task<bool> AddTaskAsync(TaskItem task);
 
-        Task<TaskItem?> GetByIdAsync(Guid taskId);
+        Task<TaskItem?> GetByIdAsync(int taskId);
 
-        Task<TaskItem?> ClaimNextTaskAsync(Guid workerId);
+        Task<TaskItem?> ClaimNextTaskAsync();
 
         Task<bool> UpdateByIdAsync(TaskItem item);
 
-        Task<bool> MarkAsSuccessAsync(Guid taskId, Guid workerId, int fencingToken);
+        Task<bool> MarkAsSuccessAsync(int taskId, int fencingToken);
 
-        Task<bool> MarkAsFailedAsync(Guid taskId, Guid workerId, int fencingToken);
+        Task<bool> MarkAsFailedAsync(int taskId, int fencingToken, string? errorMessage);
 
-        Task<bool> HeartbeatAsync(Guid taskId, Guid workerId, int fencingToken);
+        Task<bool> HeartbeatAsync(int taskId, int fencingToken);
     }
 }

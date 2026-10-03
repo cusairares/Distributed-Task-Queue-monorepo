@@ -4,28 +4,26 @@ using DTQ.Domain.Enums;
 namespace DTQ.Application.Responses
 {
     public record TaskResponseDto(
-        Guid Id,
-        string Name,
-        string TaskType,
-        string Payload,
+        int Id,
+        string? Payload,
         TaskItemStatus Status,
         int MaxRetries,
         int RetriesCount,
-        DateTimeOffset CreationDate,
-        int FencingToken)
+        DateTime CreatedAt,
+        int FencingToken,
+        string? ErrorMessage)
     {
         public static TaskResponseDto FromDomain(TaskItem task)
         {
             return new TaskResponseDto(
                 task.Id,
-                task.Name,
-                task.TaskType,
                 task.Payload,
                 task.Status,
                 task.MaxRetries,
                 task.RetriesCount,
-                task.CreationDate,
-                task.FencingToken ?? 0
+                task.CreatedAt,
+                task.FencingToken,
+                task.ErrorMessage
             );
         }
     }
