@@ -28,10 +28,11 @@ namespace DTQ.Domain
         #endregion
 
         // Required by EF Core
-        private TaskItem()
+        public TaskItem()
         {
         }
 
+        //Note for self: constructor is not used by the EF. It can populate the entites through the private setters
         public TaskItem(string name, string taskType, string? payload, int maxRetries)
         {
             Name = name;

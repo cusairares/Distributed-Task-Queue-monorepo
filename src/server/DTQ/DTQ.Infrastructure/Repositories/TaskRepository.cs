@@ -1,50 +1,66 @@
 using DTQ.Domain;
 using DTQ.Domain.Enums;
 using DTQ.Domain.Interfaces;
+using DTQ.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 
 namespace DTQ.Infrastructure.Repositories
 {
     public class TaskRepository : ITaskRepository
     {
+        private readonly AppDbContext _context;
+        public TaskRepository(AppDbContext context)
+        {
+            _context = context; 
+        }
 
         // Mock will be replaced with PostgreSQL
         private static readonly ConcurrentDictionary<int, TaskItem> _tasks = new();
         private static int _nextId = 0;
 
-        public Task<bool> AddTaskAsync(TaskItem task)
+        public async Task<bool> AddTaskAsync(TaskItem task)
         {
-            task.AssignId(Interlocked.Increment(ref _nextId));
-            var added = _tasks.TryAdd(task.Id, task);
-            return Task.FromResult(added);
+            _context.Tasks.Add(task);
+            var rows = await _context.SaveChangesAsync();
+            return rows > 0;
         }
 
-        public Task<IReadOnlyList<TaskItem>> GetAllTasksAsync()
+        public async Task<IReadOnlyList<TaskItem>> GetAllTasksAsync()
         {
-            IReadOnlyList<TaskItem> list = _tasks.Values.ToList();
-            return Task.FromResult(list);
+            return await _context.Tasks
+                    .AsNoTracking()
+                    .ToListAsync();
         }
 
-        public Task<IReadOnlyList<TaskItem>> GetTasksByStatusAsync(TaskItemStatus status)
+        public async Task<IReadOnlyList<TaskItem>> GetTasksByStatusAsync(TaskItemStatus status)
         {
-            IReadOnlyList<TaskItem> list = _tasks.Values.Where(t => t.Status == status).ToList();
-            return Task.FromResult(list);
+            return await _context.Tasks
+            .AsNoTracking()
+            .Where(x => x.Status == status)
+            .ToListAsync();
         }
 
-        public Task<TaskItem?> GetByIdAsync(int taskId)
+        public async Task<TaskItem?> GetByIdAsync(int taskId)
         {
-            _tasks.TryGetValue(taskId, out var task);
-            return Task.FromResult(task);
+            return await _context.Tasks
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == taskId);
         }
 
-        public Task<bool> UpdateByIdAsync(TaskItem item)
+        public async Task<bool> UpdateByIdAsync(TaskItem item)
         {
-            if (!_tasks.TryGetValue(item.Id, out var existing))
-            {
-                return Task.FromResult(false);
-            }
+            int rowsAffected = await _context.Tasks
+                    .Where(x => x.Id == item.Id)
+                    .ExecuteUpdateAsync(setters => setters
+                        .SetProperty(x => x.Status, item.Status)
+                        .SetProperty(x => x.Payload, item.Payload)
+                        .SetProperty(x => x.MaxRetries, item.MaxRetries)
+                        .SetProperty(x => x.RetriesCount, item.RetriesCount)
+                        .SetProperty(x => x.FencingToken, item.FencingToken)
+                        .SetProperty(x => x.ErrorMessage, item.ErrorMessage));
 
-            return Task.FromResult(_tasks.TryUpdate(item.Id, item, existing));
+            return rowsAffected > 0;
         }
 
         public Task<TaskItem?> ClaimNextTaskAsync()
