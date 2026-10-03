@@ -54,8 +54,7 @@ namespace DTQ.Infrastructure.Data
                 entity.Property(t => t.CreatedAt)
                     .HasColumnName("created_at")
                     .HasColumnType("timestamp without time zone")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                    .ValueGeneratedOnAdd();
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(t => t.ErrorMessage)
                     .HasColumnName("error_message")
