@@ -9,9 +9,9 @@ namespace DTQ.Application.Interfaces
     {
         Task<Result<TaskResponseDto>> CreateTaskAsync(CreateTaskRequest taskRequest);
         Task<IReadOnlyList<TaskResponseDto>> GetTasksAsync(TaskItemStatus? status);
-        Task<Result<TaskResponseDto>> ClaimTaskAsync(Guid workerId);
-        Task<Result> MarkAsSuccessAsync(Guid taskId, UpdateTaskRequest request);
-        Task<Result> MarkAsFailedAsync(Guid taskId, UpdateTaskRequest request);
-        Task<Result> HeartbeatAsync(Guid taskId, UpdateTaskRequest request);
+        Task<Result<TaskResponseDto>> ClaimTaskAsync();
+        Task<Result> MarkAsSuccessAsync(int taskId, UpdateTaskRequest request);
+        Task<Result> MarkAsFailedAsync(int taskId, UpdateTaskRequest request);
+        Task<Result> HeartbeatAsync(int taskId, UpdateTaskRequest request);
     }
 }

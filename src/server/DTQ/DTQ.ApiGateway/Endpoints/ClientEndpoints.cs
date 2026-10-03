@@ -31,6 +31,16 @@ namespace DTQ.ApiGateway.Endpoints
                     return Results.Problem(detail: "Task type is required.", statusCode: StatusCodes.Status400BadRequest, title: "Validation Error");
                 }
 
+                if (request.Name.Length > 20)
+                {
+                    return Results.Problem(detail: "Task name cannot exceed 20 characters.", statusCode: StatusCodes.Status400BadRequest, title: "Validation Error");
+                }
+
+                if (request.TaskType.Length > 20)
+                {
+                    return Results.Problem(detail: "Task type cannot exceed 20 characters.", statusCode: StatusCodes.Status400BadRequest, title: "Validation Error");
+                }
+
                 if (request.MaxRetries < 0)
                 {
                     return Results.Problem(detail: "MaxRetries cannot be negative.", statusCode: StatusCodes.Status400BadRequest, title: "Validation Error");

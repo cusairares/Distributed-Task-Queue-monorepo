@@ -40,9 +40,9 @@ namespace DTQ.Application.Services
             return Result<TaskResponseDto>.Success(TaskResponseDto.FromDomain(task));
         }
 
-        public async Task<Result<TaskResponseDto>> ClaimTaskAsync(Guid workerId)
+        public async Task<Result<TaskResponseDto>> ClaimTaskAsync()
         {
-            var task = await _repository.ClaimNextTaskAsync(workerId);
+            var task = await _repository.ClaimNextTaskAsync();
 
             if (task == null)
             {
@@ -52,9 +52,9 @@ namespace DTQ.Application.Services
             return Result<TaskResponseDto>.Success(TaskResponseDto.FromDomain(task));
         }
 
-        public async Task<Result> MarkAsSuccessAsync(Guid taskId, UpdateTaskRequest request)
+        public async Task<Result> MarkAsSuccessAsync(int taskId, UpdateTaskRequest request)
         {
-            var completed = await _repository.MarkAsSuccessAsync(taskId, request.WorkerId, request.FencingToken);
+            var completed = await _repository.MarkAsSuccessAsync(taskId, request.FencingToken);
 
             if (!completed)
             {
@@ -64,9 +64,15 @@ namespace DTQ.Application.Services
             return Result.Success();
         }
 
-        public async Task<Result> MarkAsFailedAsync(Guid taskId, UpdateTaskRequest request)
+        public async Task<Result> MarkAsFailedAsync(int taskId, UpdateTaskRequest request)
         {
-            var completed = await _repository.MarkAsFailedAsync(taskId, request.WorkerId, request.FencingToken);
+            var errorMessage = request.ErrorMessage;
+            if (errorMessage is { Length: > 30 })
+            {
+                errorMessage = errorMessage[..30];
+            }
+
+            var completed = await _repository.MarkAsFailedAsync(taskId, request.FencingToken, errorMessage);
 
             if (!completed)
             {
@@ -76,9 +82,9 @@ namespace DTQ.Application.Services
             return Result.Success();
         }
 
-        public async Task<Result> HeartbeatAsync(Guid taskId, UpdateTaskRequest request)
+        public async Task<Result> HeartbeatAsync(int taskId, UpdateTaskRequest request)
         {
-            var completed = await _repository.HeartbeatAsync(taskId, request.WorkerId, request.FencingToken);
+            var completed = await _repository.HeartbeatAsync(taskId, request.FencingToken);
 
             if (!completed)
             {

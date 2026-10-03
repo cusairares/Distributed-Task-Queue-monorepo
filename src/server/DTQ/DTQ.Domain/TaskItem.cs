@@ -5,69 +5,55 @@ namespace DTQ.Domain
     public class TaskItem
     {
         #region Properties
-        private Guid _id;
-        private string _name;
-        private string _taskType;
-        private TaskItemStatus _status;
-        private string _payload;
+        public int Id { get; private set; }
 
-        private int _maxRetries;
-        private int _retriesCount;
-        private int? _fencingToken;
+        public string Name { get; private set; } = string.Empty;
 
+        public string TaskType { get; private set; } = string.Empty;
 
-        private DateTimeOffset? _leaseExpiresAt;
-        private DateTimeOffset _creationDate;
+        public TaskItemStatus Status { get; private set; }
 
-        private Guid? _workerId;
-        public Guid Id => _id;
+        public string? Payload { get; private set; }
 
-        public Guid? WorkerId => _workerId;
-        public string Name => _name;
+        public int MaxRetries { get; private set; }
 
-        public string TaskType => _taskType;
+        public int RetriesCount { get; private set; }
 
-        public int MaxRetries => _maxRetries;
+        public int FencingToken { get; private set; }
 
-        public int RetriesCount => _retriesCount;
+        public DateTime CreatedAt { get; private set; }
 
-        public int? FencingToken => _fencingToken;
-
-        public TaskItemStatus Status => _status;
-
-        public DateTimeOffset? LeaseExpiresAt => _leaseExpiresAt;
-
-        public string Payload => _payload;
-
-        public DateTimeOffset CreationDate => _creationDate;
+        public string? ErrorMessage { get; private set; }
 
         #endregion
-        
-        public TaskItem(Guid id, string name, string taskType, string payload, int maxRetries, DateTimeOffset creationDate)
+
+        // Required by EF Core
+        private TaskItem()
         {
-            _id = id;
-            _name = name;
-            _taskType = taskType;
-            _status = TaskItemStatus.Pending;
-            _payload = payload;
-            _maxRetries = maxRetries;
-            _retriesCount = 0;
-            _fencingToken = null;
-            _leaseExpiresAt = null;
-            _creationDate = creationDate;
-            _workerId = null;
         }
 
-        public static TaskItem Create(string name, string taskType, string payload, int maxRetries)
+        public TaskItem(string name, string taskType, string? payload, int maxRetries)
         {
-            return new TaskItem(
-                Guid.NewGuid(),
-                name,
-                taskType,
-                payload,
-                maxRetries,
-                DateTimeOffset.UtcNow
-            );
+            Name = name;
+            TaskType = taskType;
+            Status = TaskItemStatus.Pending;
+            Payload = payload;
+            MaxRetries = maxRetries;
+            // Id, RetriesCount, FencingToken and CreatedAt are provided by database defaults.
+        }
+
+        public static TaskItem Create(string name, string taskType, string? payload, int maxRetries)
+        {
+            return new TaskItem(name, taskType, payload, maxRetries);
+        }
+
+        /// <summary>
+        /// Applies the values a database would generate on insert (used by non-database repositories).
+        /// </summary>
+        public void ApplyInsertDefaults(int id, DateTime createdAt)
+        {
+            Id = id;
+            CreatedAt = createdAt;
         }
     }
 }
