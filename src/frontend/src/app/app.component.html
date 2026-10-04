@@ -1,12 +1,53 @@
-<div class="header">
-    <img src="server.png" (click)="onSidebarToggle()">
-    <div> Distributed Task Queue</div>
-</div>
-<div class="wrapper">
-  <div class="sidebar-container" [class.collapsed]="queueFacade.isSidebarOpen$()">
-      <app-sidebar />
+<header class="app-header">
+  <div class="header-left">
+    <button class="toggle-btn" (click)="onSidebarToggle()" aria-label="Toggle navigation">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">{{ appBrand }}</span>
+        <span class="brand-tag"> {{ appName }}</span>
+      </div>
+    </div>
   </div>
-  <div class="main-container">
+
+  <div class="header-right">
+    <div class="system-status">
+      <span class="status-indicator"></span>
+      <span class="status-label">Worker 1 Active</span>
+    </div>
+    <div class="db-status">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+      </svg>
+      <span>PostgreSQL Ready</span>
+    </div>
+  </div>
+</header>
+
+<div class="app-body">
+  <aside class="sidebar-wrapper" [class.collapsed]="queueFacade.isSidebarOpen$()">
+    <app-sidebar />
+  </aside>
+  <main class="main-content">
+    <div class="content-viewport">
       <router-outlet />
-  </div>
+    </div>
+  </main>
 </div>
